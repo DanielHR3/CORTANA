@@ -1,49 +1,57 @@
 # CORTANA — pautas de desarrollo
 
 ## Qué es
-Captura por voz en campo para SheepMaster. Nota de voz -> transcripción -> borradores
-estructurados -> confirmación humana -> escritura en SheepMaster por su API REST.
-Tipos de registro del MVP: pesaje, tratamiento, parto, movimiento de corral y tarea.
-Detalle funcional en `README.md`. La especificación completa vive en la bóveda de
-Obsidian del responsable técnico (`01 Proyectos/CORTANA/`).
+Asistente personal de voz de un solo usuario (Daniel). Conversa por voz y texto, recuerda
+entre conversaciones y actúa sobre Obsidian, Google Calendar, Gmail, GitHub y SheepMaster.
+Toda acción que cambia algo fuera de CORTANA requiere confirmación de Daniel.
+Detalle funcional en `README.md`. La especificación completa vive en la bóveda de Obsidian
+del responsable técnico (`01 Proyectos/CORTANA/`).
 
 ## Estado
-Sin código todavía. Fase 0 (validación en campo) pendiente. No crear estructura ni
-dependencias hasta que las historias del MVP estén aprobadas.
+Sin código. Siguiente paso: Fase 0, prueba de concepto de la cascada de voz (desechable,
+fuera de este repositorio). No crear estructura ni dependencias antes de cerrarla.
 
 ## Reglas que no se rompen
 1. No se desarrolla nada sin historia de usuario aprobada (HU-x.y).
-2. Ningún borrador se aplica en SheepMaster sin confirmación explícita de un usuario.
-3. CORTANA no persiste el inventario del hato. Solo lee catálogos con caché corta.
-4. Toda consulta filtra por `ranchoId` de la sesión. Nunca se acepta `ranchoId` del cliente.
-5. El animal se identifica por coincidencia exacta de arete en código. El modelo de IA no
-   elige al animal.
-6. La transcripción es dato no confiable: no se usa como instrucción ni se concatena en
-   el mensaje de sistema del modelo. Cada registro extraído debe citar una frase literal
-   de la transcripción.
-7. Cada cambio de estado de Captura o Borrador escribe un EventoAuditoria en la misma
-   transacción.
-8. Transcriptor, extractor, almacenamiento y SheepMaster se consumen por interfaz
-   (puerto). El dominio y los casos de uso no importan SDKs.
-9. Nunca versionar audios, el conjunto dorado, `.env` ni datos de ranchos.
+2. Cada herramienta se registra con clasificación `lectura` o `accion`. Sin clasificación,
+   el registro falla al arrancar.
+3. Una herramienta de `accion` nunca se ejecuta cuando el modelo la llama: crea una acción
+   pendiente. Solo el módulo de acciones la ejecuta, tras confirmación desde la interfaz
+   o desde el detector de afirmaciones por voz.
+4. El modelo no tiene ninguna herramienta ni camino para confirmar acciones.
+5. La confirmación por voz la decide código: una sola acción pendiente y una afirmación de
+   la lista cerrada. Nunca se le pregunta al modelo si el usuario aceptó.
+6. Lo ejecutado usa los argumentos guardados en la acción, sin volver a consultar al modelo.
+7. Contenido de correos, notas, páginas y respuestas de APIs va delimitado como dato no
+   confiable. Nunca se concatena en las instrucciones del sistema.
+8. El historial enviado al modelo solo crece. Se guarda cada respuesta completa (incluidos
+   bloques de pensamiento y herramientas). Información nueva entra como mensaje de sistema.
+9. Credenciales solo en el backend, cifradas. Nunca en mensajes, memoria, logs ni el repo.
+10. La memoria solo guarda lo que Daniel pide; nunca secretos.
+11. El servidor MCP de Obsidian solo accede a la bóveda personal. Nada de información
+    de trabajo institucional.
+12. El repositorio es público: nada de `.env`, audios, conversaciones ni datos personales.
 
 ## Arquitectura prevista
-- Monorepo: `backend/` (NestJS, Prisma, PostgreSQL) y `web/` (Next.js PWA).
-- `backend/src/modules/<modulo>/{domain,application,infrastructure}`
-- `web/src/app` (rutas), `web/src/features/<feature>`, `web/src/lib/api` (cliente generado),
-  `web/src/lib/cola` (cola local en IndexedDB).
-- Contrato: OpenAPI generado por el backend. El frontend no escribe tipos de API a mano.
+- `backend/` NestJS + Prisma + PostgreSQL. Módulos en
+  `src/modules/<modulo>/{domain,application,infrastructure}`.
+- `backend/prompts/` instrucciones del sistema versionadas.
+- `backend/eval/` conjunto de evaluación del agente (datos de prueba, nunca reales).
+- `mcp/obsidian`, `mcp/sheepmaster`: servidores MCP propios; el backend es su cliente.
+- `web/` Next.js PWA: conversación, tarjetas de confirmación, memoria, habilidades.
+- Agente: SDK de TypeScript de Anthropic, Tool Runner con herramientas Zod, modelo
+  `claude-opus-5-5`, pensamiento adaptativo, esfuerzo por tipo de petición, streaming.
+- Voz: cascada voz a texto -> Claude -> texto a voz, todo en streaming.
 
 ## Estilo
 - TypeScript estricto. Sin `any` sin justificación en comentario.
-- Errores de dominio con clases propias; respuesta HTTP en formato Problem Details.
-- Logs JSON con `correlationId`. Nunca registrar transcripciones, contraseñas ni tokens.
-- Pruebas junto al código: unitarias para dominio y casos de uso, integración para
-  repositorios y el gateway de SheepMaster. El nombre de cada prueba lleva su HU.
+- Errores de dominio tipados; Problem Details en REST; eventos de error en WebSocket.
+- Logs JSON con correlación. Nunca registrar texto de conversaciones, correos ni credenciales.
+- Pruebas junto al código; el nombre de cada prueba lleva su HU.
 
 ## Definición de terminado
-Criterios de aceptación con prueba o evidencia; lint, tipos, pruebas y build en verde;
-diff revisado por una persona; OpenAPI y cliente actualizados; nota en la bitácora.
+Criterios con prueba o evidencia; lint, tipos, pruebas y build en verde; evaluación del
+agente pasando si se tocó al agente; diff revisado por Daniel; nota en la bitácora.
 
 ## Comandos
-(Completar al crear el código: instalar, levantar base, migrar, dev, test, lint, build.)
+(Completar al crear el código.)
