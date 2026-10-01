@@ -4,7 +4,7 @@
 
 En el espíritu de JARVIS en *Iron Man* o Cortana en *Halo*.
 
-> **Estado: en diseño.** Todavía no hay código. Lo que sigue es el alcance de la primera versión, no algo que ya funcione. La sección [Estado y ruta](#estado-y-ruta) dice qué falta y en qué orden.
+> **Estado: en pausa, solo documentación.** Todavía no hay código y el desarrollo no ha empezado. Lo que sigue es el alcance diseñado para la primera versión, no algo que ya funcione. La sección [Estado y ruta](#estado-y-ruta) dice qué falta y en qué orden.
 
 ---
 
@@ -103,7 +103,7 @@ Claude no recibe audio directamente, así que la voz es una cascada: **voz a tex
 
 | Fase | Objetivo | Estado |
 |---|---|---|
-| **0. Prueba de voz** | Medir la latencia real de la cascada y elegir proveedores | ⏳ Siguiente |
+| **0. Prueba de voz** | Medir la latencia real de la cascada y elegir proveedores | En pausa |
 | **1. Texto** | Conversación por texto, memoria y lectura de Obsidian | Pendiente |
 | **2. Voz** | Hablar y escuchar, con interrupción | Pendiente |
 | **3. Acciones** | Calendario, correo y notas con confirmación | Pendiente |

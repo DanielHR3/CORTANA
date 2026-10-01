@@ -8,8 +8,9 @@ Detalle funcional en `README.md`. La especificación completa vive en la bóveda
 del responsable técnico (`01 Proyectos/CORTANA/`).
 
 ## Estado
-Sin código. Siguiente paso: Fase 0, prueba de concepto de la cascada de voz (desechable,
-fuera de este repositorio). No crear estructura ni dependencias antes de cerrarla.
+Sin código. Proyecto en pausa, solo documentación. Cuando se retome, el primer paso es
+la Fase 0: prueba de concepto de la cascada de voz (desechable, fuera de este repositorio).
+No crear estructura ni dependencias antes de cerrarla.
 
 ## Reglas que no se rompen
 1. No se desarrolla nada sin historia de usuario aprobada (HU-x.y).
